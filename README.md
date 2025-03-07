@@ -35,7 +35,8 @@ This package enables the use of ZED cameras with ROS 2, providing access to a va
 
 - [CUDA](https://developer.nvidia.com/cuda-downloads) dependency
 
-- [ROS2 Humble on Ubuntu 22.04](https://docs.ros.org/en/humble/Installation/Linux-Install-Debians.html)
+- [ROS2 d: command not found
+Humble on Ubuntu 22.04](https://docs.ros.org/en/humble/Installation/Linux-Install-Debians.html)
 
 ### Build the package
 
