@@ -1,69 +1,35 @@
 LATEST CHANGES
 ==============
 
-2025-02-27
+2024_09_27
 ----------
-- Improve Node Diagnostics information
+- Fix `~/imu/data_raw` message not containing RAW IMU data
 
-2025-02-24
+2024-09-23
 ----------
-- Add `general.camera_id` parameter to set the camera ID for the ZedCamera. 
-- Add `general.camera_id` parameter to set the camera ID for the ZedCameraOne.
-- Add `camera_id` argument to the `zed_camera.launch.py` launch file. Useful for GMSL2 multi-camera configurations where camera ID is estabilished by the GMSL2 wire.
+- Add support for FFMPEG image transport
+- Add new `ffmpeg.yaml` configuration file
 
-
-2025-02-17
+2024-07-31
 ----------
-- Add uptime and frame drop rate information to node diagnostics
-- Add image validity check support [SDK 5 required]
+- Add support for point cloud transport
 
-  - Add new parameter 'general.enable_image_validity_check'
-  - Add new topic 'health_status/low_image_quality' to publish image quality status
-  - Add new topic 'health_status/low_lighting' to publish low light condition status
-  - Add new topic 'health_status/low_depth_reliability' to publish low depth quality status
-  - Add new topic 'health_status/low_motion_sensors_reliability' to publish low quality of inertial sensors status
-  - Set the Node Disgnostic to WARNING if any of the above conditions are detected
-
-2025-02-14
+2024-07-15
 ----------
-- Add new parameter 'depth.point_cloud_res' to set a specific point cloud publishing resolution
+- Fixed a bug while playing a ZED X stream on a "not-Jetson" host device
 
-  - 'COMPACT': Standard resolution. Optimizes processing and bandwidth
-  - 'REDUCED': Half 'COMPACT' resolution. Low processing and low bandwidth requirements
+2024-06-24
+----------
+- Changed default DDS Middleware to FastDDS in Docker
 
-v4.2.x
-------
-- Add new `OPTIMIZED` mode for `general.pub_resolution`
-- Add new parameter `general.async_image_retrieval` to enable/disable the asynchronous image retrieval to be used with SVO recording.
-- Set the Positional Tracking Mode to `GEN_1` as default as wa orkaround for the random crash issue caused by `GEN_2` mode.
-- Fixed a bug for raw gray image publisher on Zed One Component: raw gray images were not published when the rectified image topic was subscribed. Thx @Alex-Beh 
-- Enabled grayscale output for ZED X One cameras (SDK v4.2.3 required)
-- Enabled streaming input for ZED X One cameras (SDK v4.2.3 required)
-- Fixed wrong range check for the `general.pub_downscale_factor` parameter
-- Enhanced sensor thread rate due to an automatically adjusting sleep time
-- Removed the `zed-ros2-interfaces` sub-module. The `zed_msgs` package is now included in ROS 2 Humble binaries and can be installed with `sudo apt install ros-humble-zed-msgs`.
-- Fixed 4K resolution support for ZED X One 4K cameras
-- Changed C++ version to 17 to follow ROS 2 Humble standard
-- Renamed `common.yaml` to `common_stereo.yaml`
-- Added `common_mono.yaml` for monocular cameras
-- Added `video.enable_hdr` to `zedxone4k.yaml` for monocular 4K cameras
-- Changed the name of the package `zed_interfaces` to `zed_msgs` to match the ROS2 naming convention
-- Added the new `stereolabs::ZedCameraOne` component to handle ZED X One cameras
-- Removed the ZED Wrapper executable node.
+2024-05-29
+----------
+- New Docker configuration files allow to easily create "ZED ROS2 Wrapper" images based on specific tag versions. [Read more](./docker/README.md)
 
-  - Modified the launch file to create an isolated composable container that loads the `stereolabs:ZedCamera` or the `stereolabs:ZedCameraOne` component according to the camera model  
-
-- Added support for custom ONNX detection engine (SDK v4.2 required)
-  - Added value `CUSTOM_YOLOLIKE_BOX_OBJECTS` to the `object_detection.model` parameter
-  - Added parameter `object_detection.custom_onnx_file` to set the full path of the custom ONNX file
-  - Added parameter `object_detection.onnx_input_size` to set the size of the YOLO input tensor
-  - Added parameter `object_detection.custom_label_yaml` to set the full path to custom YAML file storing class labels in [COCO format](https://docs.ultralytics.com/datasets/detect/coco/#dataset-yaml)
-
-v4.1.x
-------
-- Updated the Docker files to the CUDA 12.4 (PC), L4T 35.4 (Jetson), SDK v4.1.4
+2024-04-26 (ZED SDK v4.1)
+-------------------------
+- Updated the Docker files to the CUDA 12.4 (PC), L4T 35.4 (Jetson), SDK v4.1.0
 - Added Local Streaming output
-
   - Added `enable_streaming` service to start/stop a streaming server
   - Added Streaming Server diagnostic
   - Added parameter 'stream_server.stream_enabled': enable the streaming server when the camera is open
@@ -74,9 +40,7 @@ v4.1.x
   - Added parameter 'stream_server.adaptative_bitrate': Bitrate will be adjusted depending on the number of packets dropped during streaming
   - Added parameter 'stream_server.chunk_size': Stream buffers are divided into X number of chunks where each chunk is chunk_size bytes long
   - Added parameter 'stream_server.target_framerate': Framerate for the streaming output
-
 - Added Local Streaming input
-
   - Added 'stream.stream_address' and 'stream.stream_port' parameter to configure the local streaming input
 - GNSS Fusion temporarily disabled *(available with 4.1.1)*
 - Moved parameter 'general.svo_file' to 'svo.svo_path'
@@ -90,7 +54,6 @@ v4.1.x
 - Added new `GnssFusionStatus` message with GNSS Fusion status information *(available with 4.1.1)*
 - Added new parameters `gnss_fusion.h_covariance_mul` and `gnss_fusion.v_covariance_mul` to control the effects of the GNSS covariance
 - Added support to Automatic ROI
-
   - Added ROI diagnostic
   - Added parameter `debug.debug_roi`
   - Publish ROI mask image on the topic `~/roi_mask` using image transport
@@ -104,16 +67,9 @@ v4.1.x
   - Added parameter `region_of_interest.apply_to_object_detection`
   - Added parameter `region_of_interest.apply_to_body_tracking`
   - Added parameter `region_of_interest.apply_to_spatial_mapping`
-
 - Removed QoS parameters to use ROS 2 QoS overwrite -> https://design.ros2.org/articles/qos_configurability.html
 - Added support for new `NEURAL_PLUS` depth mode
 - Added new `<camera_name>_gnss_link` frame to URDF to set the position of the GNSS antenna with respect to the camera position
-- New Docker configuration files allow to easily create "ZED ROS2 Wrapper" images based on specific tag versions. [Read more](./docker/README.md)
-- Fixed a bug while playing a ZED X stream on a "not-Jetson" host device
-- Add support for point cloud transport [only Humble, no Foxy]
-- Add support for FFMPEG image transport
-- Add new `ffmpeg.yaml` configuration file
-- Fix `~/imu/data_raw` message not containing RAW IMU data
 
 v4.0.8
 ------
@@ -133,10 +89,8 @@ v4.0.8
 - The reference link for positional tracking is no longer 'base_link' but `<camera_name>_camera_link`. 
   This will allow an easier ZED integration in existing robot configuration because the transform `base_link` -> `camera_link` 
   is no longer published by the ZED ROS2 Wrapper. Thanks to @SteveMacenski for the advice
-
   - Removed `parent` and `origin` parameters from `zed_macro.urdf.xacro`
   - Removed launch argument `cam_pose` from `zed_camera.launch.py`
-
 - Moved parameter `publish_imu_tf` from `pos_tracking` to `sensors` to make it available also in "no depth" configurations of the node
 - Added new parameter `pos_tracking.pos_tracking_mode` to exploit the new ZED SDK `QUALITY` mode for improved odometry and localization
 - New Video/Depth processing throttling method by using the `grab_compute_capping_fps` ZED SDK parameter instead of a dedicated thread
@@ -161,7 +115,6 @@ v4.0.0
 - Added support for ZED-X and ZED-X Mini
 
   - Moved `general.grab_resolution` and `general.grab_frame_rate` to the yaml file specific for the relative camera model (i.e. `zed.yaml`, `zedm.yaml`, `zed2.yaml`, `zed2i.yaml`, `zedx.yaml`, `zedxm.yaml`)
-
   - Added `zedx.launch.py` for ZED-X
   - Added `zedxm.launch.py` for ZED-X Mini
   - Improve `zed_macro.urdf.xacro` with specific configuration for the new camera models
@@ -307,10 +260,8 @@ v3.8.x
 - Moved Object Detection parameters from cameras configuration files to `common.yaml`
 - Moved Sensor Parameters from cameras configuration files to `common.yaml`
 - New data thread configuration to maximize data publishing frequency
-
   - Sensor data publishing moved from timer to thread
   - RGB/Depth data publishing moved from timer to thread
-
 - Fixed random errors when closing the node
 - Fixed wrong timing when playing SVO in `real-time` mode
 - Fixed units for atmospheric pressure data. Now pressure is published in `Pascals` according to the [definition of the topic](https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/FluidPressure.msg).
@@ -319,7 +270,6 @@ v3.8.x
 - Added new parameter `pos_tracking.sensor_world` to define the world type that the SDK can use to initialize the Positionnal Tracking module
 - Added new parameter `object_detection.prediction_timeout` for setting the timeout time [sec] of object prediction when not detected.
 - Added support for ZED SDK Regiorn of Interest:
-
   - Added parameter `general.region_of_interest` to set the region of interest for SDK processing.
   - Added the service `resetRoi` to reset the region of interest.
   - Added the service `setRoi` to set a new region of interest.
@@ -346,9 +296,7 @@ v3.6.x (2021-12-03)
 - Fix SVO LOOP wrong behavior. Thx @kevinanschau
 - Added xacro support for automatic URDF configuration
 - Reworked launch files to support xacro and launch parameters
-
     - Use `ros2 launch zed_wrapper <launch_file> -s` to retrieve all the available parameters
-
 - Added `svo_path:=<full path to SVO file>` as input for all the launch files to start the node using an SVO as input without modifying 'common.yaml`
 - Improved diagnostic information adding elaboration time on all the main tasks
 - Improved diagnostic time and frequencies calculation

@@ -1,4 +1,4 @@
-// Copyright 2024 Stereolabs
+// Copyright 2022 Stereolabs
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -54,6 +54,7 @@ protected:
   void getMappingParams();
   void getOdParams();
   void getBodyTrkParams();
+  void getOutStreamingParams();
   void getStreamingServerParams();
   void getAdvancedParams();
 
@@ -86,7 +87,7 @@ protected:
   void callback_pubPaths();
   void callback_pubTemp();
   void callback_gnssPubTimerTimeout();
-  rcl_interfaces::msg::SetParametersResult callback_setParameters(
+  rcl_interfaces::msg::SetParametersResult callback_paramChange(
     std::vector<rclcpp::Parameter> parameters);
   void callback_updateDiagnostic(
     diagnostic_updater::DiagnosticStatusWrapper & stat);
@@ -101,8 +102,8 @@ protected:
     std::shared_ptr<std_srvs::srv::Trigger_Response> res);
   void callback_setPose(
     const std::shared_ptr<rmw_request_id_t> request_header,
-    const std::shared_ptr<zed_msgs::srv::SetPose_Request> req,
-    std::shared_ptr<zed_msgs::srv::SetPose_Response> res);
+    const std::shared_ptr<zed_interfaces::srv::SetPose_Request> req,
+    std::shared_ptr<zed_interfaces::srv::SetPose_Response> res);
   void callback_enableObjDet(
     const std::shared_ptr<rmw_request_id_t> request_header,
     const std::shared_ptr<std_srvs::srv::SetBool_Request> req,
@@ -121,8 +122,8 @@ protected:
     std::shared_ptr<std_srvs::srv::SetBool_Response> res);
   void callback_startSvoRec(
     const std::shared_ptr<rmw_request_id_t> request_header,
-    const std::shared_ptr<zed_msgs::srv::StartSvoRec_Request> req,
-    std::shared_ptr<zed_msgs::srv::StartSvoRec_Response> res);
+    const std::shared_ptr<zed_interfaces::srv::StartSvoRec_Request> req,
+    std::shared_ptr<zed_interfaces::srv::StartSvoRec_Response> res);
   void callback_stopSvoRec(
     const std::shared_ptr<rmw_request_id_t> request_header,
     const std::shared_ptr<std_srvs::srv::Trigger_Request> req,
@@ -137,8 +138,8 @@ protected:
   void callback_clock(const rosgraph_msgs::msg::Clock::SharedPtr msg);
   void callback_setRoi(
     const std::shared_ptr<rmw_request_id_t> request_header,
-    const std::shared_ptr<zed_msgs::srv::SetROI_Request> req,
-    std::shared_ptr<zed_msgs::srv::SetROI_Response> res);
+    const std::shared_ptr<zed_interfaces::srv::SetROI_Request> req,
+    std::shared_ptr<zed_interfaces::srv::SetROI_Response> res);
   void callback_resetRoi(
     const std::shared_ptr<rmw_request_id_t> request_header,
     const std::shared_ptr<std_srvs::srv::Trigger_Request> req,
@@ -185,10 +186,7 @@ protected:
   void publishTFs(rclcpp::Time t);
   void publishOdomTF(rclcpp::Time t);
   void publishPoseTF(rclcpp::Time t);
-  bool publishSensorsData(rclcpp::Time force_ts = TIMEZERO_ROS);
-#if (ZED_SDK_MAJOR_VERSION >= 5)
-  void publishHealthStatus();
-#endif
+  rclcpp::Time publishSensorsData(rclcpp::Time t = TIMEZERO_ROS);
   // <---- Publishing functions
 
   // ----> Utility functions
@@ -271,30 +269,29 @@ private:
   // <---- Topics
 
   // ----> Parameter variables
-  bool _debugCommon = false;
-  bool _debugSim = false;
-  bool _debugVideoDepth = false;
-  bool _debugCamCtrl = false;
-  bool _debugPointCloud = false;
-  bool _debugPosTracking = false;
-  bool _debugGnss = false;
-  bool _debugSensors = false;
-  bool _debugMapping = false;
-  bool _debugObjectDet = false;
-  bool _debugBodyTrk = false;
-  bool _debugAdvanced = false;
-  bool _debugRoi = false;
-  bool _debugStreaming = false;
+  bool mDebugCommon = false;
+  bool mDebugSim = false;
+  bool mDebugVideoDepth = false;
+  bool mDebugCamCtrl = false;
+  bool mDebugPointCloud = false;
+  bool mDebugPosTracking = false;
+  bool mDebugGnss = false;
+  bool mDebugSensors = false;
+  bool mDebugMapping = false;
+  bool mDebugObjectDet = false;
+  bool mDebugBodyTrk = false;
+  bool mDebugAdvanced = false;
+  bool mDebugRoi = false;
+  bool mDebugStreaming = false;
 
   int mCamSerialNumber = 0;
-  int mCamId = -1;
   bool mSimMode = false;     // Expecting simulation data?
   bool mUseSimTime = false;  // Use sim time?
   std::string mSimAddr =
     "127.0.0.1";    // The local address of the machine running the simulator
   int mSimPort = 30000;  // The port to be used to connect to the simulator
 
-  bool mStreamMode = false;     // Expecting local streaming data?
+  bool mStreamMode = false;     // Expecting simulation data?
   std::string mStreamAddr = "";  // The local address of the streaming server
   int mStreamPort = 30000;  // The port to be used to connect to a local streaming server
 
@@ -304,33 +301,31 @@ private:
   unsigned int mSensFwVersion;               // Sensors FW version
   std::string mCameraName = "zed";           // Default camera name
   int mCamGrabFrameRate = 15;
-  bool mAsyncImageRetrieval = false;
-  int mImageValidityCheck = 1;
   std::string mSvoFilepath = "";
   bool mSvoLoop = false;
   bool mSvoRealtime = false;
   int mVerbose = 1;
   int mGpuId = -1;
   std::string mOpencvCalibFile;
-  sl::RESOLUTION mCamResol = sl::RESOLUTION::HD1080;    // Default resolution: RESOLUTION_HD1080
-  PubRes mPubResolution = PubRes::NATIVE;                     // Use native grab resolution by default
+  sl::RESOLUTION mCamResol =
+    sl::RESOLUTION::HD1080;    // Default resolution: RESOLUTION_HD1080
+  PubRes mPubResolution =
+    PubRes::NATIVE;                     // Use native grab resolution by default
   double mCustomDownscaleFactor = 1.0;  // Used to rescale data with user factor
-  bool mOpenniDepthMode =
-    false;    // 16 bit UC data in mm else 32F in m,
-              // for more info -> http://www.ros.org/reps/rep-0118.html
-  double mCamMinDepth = 0.1;
-  double mCamMaxDepth = 10.0;
-  sl::DEPTH_MODE mDepthMode = sl::DEPTH_MODE::NEURAL;
-  PcRes mPcResolution = PcRes::COMPACT;
-  bool mDepthDisabled = false;  // Indicates if depth calculation is not required (DEPTH_MODE::NONE)
+  sl::DEPTH_MODE mDepthMode =
+    sl::DEPTH_MODE::ULTRA;      // Default depth mode: ULTRA
+  bool mDepthDisabled = false;  // Indicates if depth calculation is not
+                                // required (DEPTH_MODE::NONE)
   int mDepthStabilization = 1;
-
   int mCamTimeoutSec = 5;
   int mMaxReconnectTemp = 5;
   bool mCameraSelfCalib = true;
   bool mCameraFlip = false;
-
-
+  bool mOpenniDepthMode =
+    false;    // 16 bit UC data in mm else 32F in m,
+              // for more info -> http://www.ros.org/reps/rep-0118.html
+  double mCamMinDepth = 0.2;
+  double mCamMaxDepth = 10.0;
   bool mSensCameraSync = false;
   double mSensPubRate = 400.;
 
@@ -400,10 +395,6 @@ private:
   sl::OBJECT_DETECTION_MODEL mObjDetModel =
     sl::OBJECT_DETECTION_MODEL::MULTI_CLASS_BOX_FAST;
   sl::OBJECT_FILTERING_MODE mObjFilterMode = sl::OBJECT_FILTERING_MODE::NMS3D;
-  std::string mYoloOnnxPath;
-  int mYoloOnnxSize;
-  std::string mCustomLabelsPath;
-  std::unordered_map<std::string, std::string> mCustomLabels;
 
   bool mBodyTrkEnabled = false;
   sl::BODY_TRACKING_MODEL mBodyTrkModel =
@@ -519,7 +510,6 @@ private:
   int mCamWidth;   // Camera frame width
   int mCamHeight;  // Camera frame height
   sl::Resolution mMatResol;
-  sl::Resolution mPcResol;
   // <---- Stereolabs Mat Info
 
   // Camera IMU transform
@@ -630,33 +620,28 @@ private:
   gnssFusionStatusPub mPubGeoPoseStatus;
   gnssFixPub mPubFusedFix;
   gnssFixPub mPubOriginFix;
-
-  healthPub mPubHealthImage;
-  healthPub mPubHealthLight;
-  healthPub mPubHealthDepth;
-  healthPub mPubHealthSensor;
   // <---- Publishers
 
   // <---- Publisher variables
   sl::Timestamp mSdkGrabTS = 0;
-  size_t mRgbSubCount = 0;
-  size_t mRgbRawSubCount = 0;
-  size_t mRgbGraySubCount = 0;
-  size_t mRgbGrayRawSubCount = 0;
-  size_t mLeftSubCount = 0;
-  size_t mLeftRawSubCount = 0;
-  size_t mLeftGraySubCount = 0;
-  size_t mLeftGrayRawSubCount = 0;
-  size_t mRightSubCount = 0;
-  size_t mRightRawSubCount = 0;
-  size_t mRightGraySubCount = 0;
-  size_t mRightGrayRawSubCount = 0;
-  size_t mStereoSubCount = 0;
-  size_t mStereoRawSubCount = 0;
-  size_t mDepthSubCount = 0;
-  size_t mConfMapSubCount = 0;
-  size_t mDisparitySubCount = 0;
-  size_t mDepthInfoSubCount = 0;
+  size_t mRgbSubnumber = 0;
+  size_t mRgbRawSubnumber = 0;
+  size_t mRgbGraySubnumber = 0;
+  size_t mRgbGrayRawSubnumber = 0;
+  size_t mLeftSubnumber = 0;
+  size_t mLeftRawSubnumber = 0;
+  size_t mLeftGraySubnumber = 0;
+  size_t mLeftGrayRawSubnumber = 0;
+  size_t mRightSubnumber = 0;
+  size_t mRightRawSubnumber = 0;
+  size_t mRightGraySubnumber = 0;
+  size_t mRightGrayRawSubnumber = 0;
+  size_t mStereoSubnumber = 0;
+  size_t mStereoRawSubnumber = 0;
+  size_t mDepthSubnumber = 0;
+  size_t mConfMapSubnumber = 0;
+  size_t mDisparitySubnumber = 0;
+  size_t mDepthInfoSubnumber = 0;
 
   sl::Mat mMatLeft, mMatLeftRaw;
   sl::Mat mMatRight, mMatRightRaw;
@@ -684,6 +669,7 @@ private:
   sl::ERROR_CODE mConnStatus;
   sl::FUSION_ERROR_CODE mFusionStatus = sl::FUSION_ERROR_CODE::MODULE_NOT_ENABLED;
   std::thread mGrabThread;        // Main grab thread
+  std::thread mVideoDepthThread;  // RGB/Depth data publish thread
   std::thread mPcThread;          // Point Cloud publish thread
   std::thread mSensThread;        // Sensors data publish thread
   std::atomic<bool> mThreadStop;
@@ -693,7 +679,6 @@ private:
   rclcpp::TimerBase::SharedPtr
     mTempPubTimer;    // Timer to retrieve and publish CMOS temperatures
   rclcpp::TimerBase::SharedPtr mGnssPubCheckTimer;
-  double mSensRateComp = 1.0;
   // <---- Threads and Timers
 
   // ----> Thread Sync
@@ -743,8 +728,6 @@ private:
   // published when `use_sim_time` is true
 
   std::atomic<bool> mStreamingServerRunning;
-
-  bool mCustomLabelsGood = false;
   // <---- Status Flags
 
   // ----> Positional Tracking
@@ -767,7 +750,6 @@ private:
   // <---- Positional Tracking
 
   // ----> Diagnostic
-  sl_tools::StopWatch mUptimer;
   float mTempImu = NOT_VALID_TEMP;
   float mTempLeft = NOT_VALID_TEMP;
   float mTempRight = NOT_VALID_TEMP;
@@ -876,31 +858,6 @@ private:
   std::unique_ptr<sl_tools::GNSSReplay> mGnssReplay;
   // <---- SVO v2
 };
-
-// ----> Template Function definitions
-template<typename T>
-void ZedCamera::getParam(
-  std::string paramName, T defValue, T & outVal,
-  std::string log_info, bool dynamic)
-{
-  rcl_interfaces::msg::ParameterDescriptor descriptor;
-  descriptor.read_only = !dynamic;
-
-  declare_parameter(paramName, rclcpp::ParameterValue(defValue), descriptor);
-
-  if (!get_parameter(paramName, outVal)) {
-    RCLCPP_WARN_STREAM(
-      get_logger(),
-      "The parameter '"
-        << paramName
-        << "' is not available or is not valid, using the default value: "
-        << defValue);
-  }
-
-  if (!log_info.empty()) {
-    RCLCPP_INFO_STREAM(get_logger(), log_info << outVal);
-  }
-}
 
 }  // namespace stereolabs
 

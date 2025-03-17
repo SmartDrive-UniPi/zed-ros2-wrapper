@@ -52,9 +52,9 @@ if(NOT CMAKE_C_STANDARD)
   set(CMAKE_C_STANDARD 99)
 endif()
 
-# Default to C++17
+# Default to C++14
 if(NOT CMAKE_CXX_STANDARD)
-  set(CMAKE_CXX_STANDARD 17)
+  set(CMAKE_CXX_STANDARD 14)
 endif()
 
 # if CMAKE_BUILD_TYPE is not specified, take 'Release' as default
@@ -102,7 +102,7 @@ set(DEPENDENCIES
     geographic_msgs
     sensor_msgs
     stereo_msgs
-    zed_msgs
+    zed_interfaces
     std_srvs
     diagnostic_msgs
     diagnostic_updater
@@ -115,7 +115,7 @@ find_package(ament_cmake_auto REQUIRED)
 ament_auto_find_build_dependencies()
 
 find_package(rcutils REQUIRED)
-find_package(zed_msgs)
+find_package(zed_interfaces)
 find_package(rclcpp REQUIRED)
 find_package(rclcpp_components REQUIRED)
 find_package(builtin_interfaces REQUIRED)
@@ -195,19 +195,9 @@ set(ZED_CAMERA_SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/zed_camera/src/zed_camera_component.cpp
 )
 
-set(ZED_CAMERA_ONE_INC
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/include/visibility_control.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/zed_camera/include/sl_types.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/zed_camera/include/zed_camera_one_component.hpp
-)
-
-set(ZED_CAMERA_ONE_SRC
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/zed_camera/src/zed_camera_one_component.cpp
-)
 ###############################################################################
 # Bin and Install
 
-# ZED Camera Component
 add_library(zed_camera_component SHARED
     ${SL_TOOLS_INC}
     ${SL_TOOLS_SRC}
@@ -234,35 +224,8 @@ ament_target_dependencies(zed_camera_component
 rclcpp_components_register_nodes(zed_camera_component "stereolabs::ZedCamera")
 set(node_plugins "${node_plugins}stereolabs::ZedCamera;$<TARGET_FILE:zed_camera_component>\n")
 
-# ZED Camera One Component
-add_library(zed_camera_one_component SHARED
-    ${SL_TOOLS_INC}
-    ${SL_TOOLS_SRC}
-    ${ZED_CAMERA_ONE_INC}
-    ${ZED_CAMERA_ONE_SRC}
-)
-target_include_directories(zed_camera_one_component PUBLIC
-    ${CUDA_INCLUDE_DIRS}
-    ${ZED_INCLUDE_DIRS}
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/zed_camera/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/tools/include
-)
-target_compile_definitions(zed_camera_one_component
-    PRIVATE "COMPOSITION_BUILDING_DLL"
-)
-target_link_libraries(zed_camera_one_component
-    ${ZED_LIBS}
-)
-ament_target_dependencies(zed_camera_one_component
-    ${DEPENDENCIES}
-)
-
-rclcpp_components_register_nodes(zed_camera_one_component "stereolabs::ZedCameraOne")
-set(node_plugins "${node_plugins}stereolabs::ZedCameraOne;$<TARGET_FILE:zed_camera_one_component>\n")
-
 # Install components
-install(TARGETS zed_camera_component zed_camera_one_component
+install(TARGETS zed_camera_component
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION lib/${PROJECT_NAME}
@@ -277,9 +240,6 @@ install(DIRECTORY
 )
 
 ament_export_include_directories(include)
-ament_export_libraries(
-    zed_camera_component
-    zed_camera_one_component
-)
+ament_export_libraries(zed_camera_component)
 ament_export_dependencies(${DEPENDENCIES})
 ament_package()

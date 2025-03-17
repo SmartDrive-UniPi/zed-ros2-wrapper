@@ -20,21 +20,19 @@
 // ----> DEBUG MACROS
 // Common
 #define DEBUG_COMM(...) \
-  if (_debugCommon) RCLCPP_DEBUG(get_logger(), __VA_ARGS__)
+  if (mDebugCommon) RCLCPP_DEBUG(get_logger(), __VA_ARGS__)
 #define DEBUG_STREAM_COMM(stream_arg) \
-  if (_debugCommon) RCLCPP_DEBUG_STREAM(get_logger(), stream_arg)
-#define DEBUG_STREAM_COMM_ONCE(stream_arg) \
-  if (_debugCommon) RCLCPP_DEBUG_STREAM_ONCE(get_logger(), stream_arg)
+  if (mDebugCommon) RCLCPP_DEBUG_STREAM(get_logger(), stream_arg)
 
 // Simulation
 #define DEBUG_SIM(...) \
-  if (_debugSim) RCLCPP_DEBUG(get_logger(), __VA_ARGS__)
+  if (mDebugSim) RCLCPP_DEBUG(get_logger(), __VA_ARGS__)
 #define DEBUG_ONCE_SIM(...) \
-  if (_debugSim) RCLCPP_DEBUG_ONCE(get_logger(), __VA_ARGS__)
+  if (mDebugSim) RCLCPP_DEBUG_ONCE(get_logger(), __VA_ARGS__)
 #define DEBUG_STREAM_SIM(stream_arg) \
-  if (_debugSim) RCLCPP_DEBUG_STREAM(get_logger(), stream_arg)
+  if (mDebugSim) RCLCPP_DEBUG_STREAM(get_logger(), stream_arg)
 #define DEBUG_STREAM_THROTTLE_SIM(duration, stream_arg) \
-  if (_debugSim) { \
+  if (mDebugSim) { \
     rclcpp::Clock steady_clock(RCL_STEADY_TIME); \
     RCLCPP_DEBUG_STREAM_THROTTLE( \
       get_logger(), steady_clock, duration, \
@@ -43,13 +41,13 @@
 
 // Advanced
 #define DEBUG_ADV(...) \
-  if (_debugAdvanced) RCLCPP_DEBUG(get_logger(), __VA_ARGS__)
+  if (mDebugAdvanced) RCLCPP_DEBUG(get_logger(), __VA_ARGS__)
 #define DEBUG_ONCE_ADV(...) \
-  if (_debugAdvanced) RCLCPP_DEBUG_ONCE(get_logger(), __VA_ARGS__)
+  if (mDebugAdvanced) RCLCPP_DEBUG_ONCE(get_logger(), __VA_ARGS__)
 #define DEBUG_STREAM_ADV(stream_arg) \
-  if (_debugAdvanced) RCLCPP_DEBUG_STREAM(get_logger(), stream_arg)
+  if (mDebugAdvanced) RCLCPP_DEBUG_STREAM(get_logger(), stream_arg)
 #define DEBUG_STREAM_THROTTLE_ADV(duration, stream_arg) \
-  if (_debugAdvanced) { \
+  if (mDebugAdvanced) { \
     rclcpp::Clock steady_clock(RCL_STEADY_TIME); \
     RCLCPP_DEBUG_STREAM_THROTTLE( \
       get_logger(), steady_clock, duration, \
@@ -58,29 +56,29 @@
 
 // Video Depth
 #define DEBUG_VD(...) \
-  if (_debugVideoDepth) RCLCPP_DEBUG(get_logger(), __VA_ARGS__)
+  if (mDebugVideoDepth) RCLCPP_DEBUG(get_logger(), __VA_ARGS__)
 #define DEBUG_STREAM_VD(stream_arg) \
-  if (_debugVideoDepth) RCLCPP_DEBUG_STREAM(get_logger(), stream_arg)
+  if (mDebugVideoDepth) RCLCPP_DEBUG_STREAM(get_logger(), stream_arg)
 
 // Camera Controls settings
 #define DEBUG_CTRL(...) \
-  if (_debugCamCtrl) RCLCPP_DEBUG(get_logger(), __VA_ARGS__)
+  if (mDebugCamCtrl) RCLCPP_DEBUG(get_logger(), __VA_ARGS__)
 #define DEBUG_STREAM_CTRL(stream_arg) \
-  if (_debugCamCtrl) RCLCPP_DEBUG_STREAM(get_logger(), stream_arg)
+  if (mDebugCamCtrl) RCLCPP_DEBUG_STREAM(get_logger(), stream_arg)
 
 // Point Cloud
 #define DEBUG_STREAM_PC(stream_arg) \
-  if (_debugPointCloud) RCLCPP_DEBUG_STREAM(get_logger(), stream_arg)
+  if (mDebugPointCloud) RCLCPP_DEBUG_STREAM(get_logger(), stream_arg)
 
 // Positional Tracking
 #define DEBUG_PT(...) \
-  if (_debugPosTracking) RCLCPP_DEBUG(get_logger(), __VA_ARGS__)
+  if (mDebugPosTracking) RCLCPP_DEBUG(get_logger(), __VA_ARGS__)
 #define DEBUG_ONCE_PT(...) \
-  if (_debugPosTracking) RCLCPP_DEBUG_ONCE(get_logger(), __VA_ARGS__)
+  if (mDebugPosTracking) RCLCPP_DEBUG_ONCE(get_logger(), __VA_ARGS__)
 #define DEBUG_STREAM_PT(stream_arg) \
-  if (_debugPosTracking) RCLCPP_DEBUG_STREAM(get_logger(), stream_arg)
+  if (mDebugPosTracking) RCLCPP_DEBUG_STREAM(get_logger(), stream_arg)
 #define DEBUG_STREAM_THROTTLE_PT(duration, stream_arg) \
-  if (_debugPosTracking) { \
+  if (mDebugPosTracking) { \
     rclcpp::Clock steady_clock(RCL_STEADY_TIME); \
     RCLCPP_DEBUG_STREAM_THROTTLE( \
       get_logger(), steady_clock, duration, \
@@ -89,11 +87,11 @@
 
 // GNSS integration
 #define DEBUG_GNSS(...) \
-  if (_debugGnss) RCLCPP_DEBUG(get_logger(), __VA_ARGS__)
+  if (mDebugGnss) RCLCPP_DEBUG(get_logger(), __VA_ARGS__)
 #define DEBUG_STREAM_GNSS(stream_arg) \
-  if (_debugGnss) RCLCPP_DEBUG_STREAM(get_logger(), stream_arg)
+  if (mDebugGnss) RCLCPP_DEBUG_STREAM(get_logger(), stream_arg)
 #define DEBUG_STREAM_THROTTLE_GNSS(duration, stream_arg) \
-  if (_debugGnss) { \
+  if (mDebugGnss) { \
     rclcpp::Clock steady_clock(RCL_STEADY_TIME); \
     RCLCPP_DEBUG_STREAM_THROTTLE( \
       get_logger(), steady_clock, duration, \
@@ -102,41 +100,41 @@
 
 // Sensors
 #define DEBUG_SENS(...) \
-  if (_debugSensors) RCLCPP_DEBUG(get_logger(), __VA_ARGS__)
+  if (mDebugSensors) RCLCPP_DEBUG(get_logger(), __VA_ARGS__)
 #define DEBUG_STREAM_SENS(stream_arg) \
-  if (_debugSensors) RCLCPP_DEBUG_STREAM(get_logger(), stream_arg)
+  if (mDebugSensors) RCLCPP_DEBUG_STREAM(get_logger(), stream_arg)
 #define DEBUG_STREAM_ONCE_SENS(stream_arg) \
-  if (_debugSensors) RCLCPP_DEBUG_STREAM_ONCE(get_logger(), stream_arg)
+  if (mDebugSensors) RCLCPP_DEBUG_STREAM_ONCE(get_logger(), stream_arg)
 
 // Mapping
 #define DEBUG_MAP(...) \
-  if (_debugMapping) RCLCPP_DEBUG(get_logger(), __VA_ARGS__)
+  if (mDebugMapping) RCLCPP_DEBUG(get_logger(), __VA_ARGS__)
 #define DEBUG_STREAM_MAP(stream_arg) \
-  if (_debugMapping) RCLCPP_DEBUG_STREAM(get_logger(), stream_arg)
+  if (mDebugMapping) RCLCPP_DEBUG_STREAM(get_logger(), stream_arg)
 #define DEBUG_STREAM_ONCE_MAP(stream_arg) \
-  if (_debugMapping) RCLCPP_DEBUG_STREAM_ONCE(get_logger(), stream_arg)
+  if (mDebugMapping) RCLCPP_DEBUG_STREAM_ONCE(get_logger(), stream_arg)
 
 // Object Detection
 #define DEBUG_OD(...) \
-  if (_debugObjectDet) RCLCPP_DEBUG(get_logger(), __VA_ARGS__)
+  if (mDebugObjectDet) RCLCPP_DEBUG(get_logger(), __VA_ARGS__)
 #define DEBUG_STREAM_OD(stream_arg) \
-  if (_debugObjectDet) RCLCPP_DEBUG_STREAM(get_logger(), stream_arg)
+  if (mDebugObjectDet) RCLCPP_DEBUG_STREAM(get_logger(), stream_arg)
 
 // Body Tracking
 #define DEBUG_BT(...) \
-  if (_debugBodyTrk) RCLCPP_DEBUG(get_logger(), __VA_ARGS__)
+  if (mDebugBodyTrk) RCLCPP_DEBUG(get_logger(), __VA_ARGS__)
 #define DEBUG_STREAM_BT(stream_arg) \
-  if (_debugBodyTrk) RCLCPP_DEBUG_STREAM(get_logger(), stream_arg)
+  if (mDebugBodyTrk) RCLCPP_DEBUG_STREAM(get_logger(), stream_arg)
 
 // Region of Interest
 #define DEBUG_ROI(...) \
-  if (_debugRoi) RCLCPP_DEBUG(get_logger(), __VA_ARGS__)
+  if (mDebugRoi) RCLCPP_DEBUG(get_logger(), __VA_ARGS__)
 #define DEBUG_ONCE_ROI(...) \
-  if (_debugRoi) RCLCPP_DEBUG_ONCE(get_logger(), __VA_ARGS__)
+  if (mDebugRoi) RCLCPP_DEBUG_ONCE(get_logger(), __VA_ARGS__)
 #define DEBUG_STREAM_ROI(stream_arg) \
-  if (_debugRoi) RCLCPP_DEBUG_STREAM(get_logger(), stream_arg)
+  if (mDebugRoi) RCLCPP_DEBUG_STREAM(get_logger(), stream_arg)
 #define DEBUG_STREAM_THROTTLE_ROI(duration, stream_arg) \
-  if (_debugRoi) { \
+  if (mDebugRoi) { \
     rclcpp::Clock steady_clock(RCL_STEADY_TIME); \
     RCLCPP_DEBUG_STREAM_THROTTLE( \
       get_logger(), steady_clock, duration, \
@@ -145,13 +143,13 @@
 
 // Streaming
 #define DEBUG_STR(...) \
-  if (_debugStreaming) RCLCPP_DEBUG(get_logger(), __VA_ARGS__)
+  if (mDebugStreaming) RCLCPP_DEBUG(get_logger(), __VA_ARGS__)
 #define DEBUG_ONCE_STR(...) \
-  if (_debugStreaming) RCLCPP_DEBUG_ONCE(get_logger(), __VA_ARGS__)
+  if (mDebugStreaming) RCLCPP_DEBUG_ONCE(get_logger(), __VA_ARGS__)
 #define DEBUG_STREAM_STR(stream_arg) \
-  if (_debugStreaming) RCLCPP_DEBUG_STREAM(get_logger(), stream_arg)
+  if (mDebugStreaming) RCLCPP_DEBUG_STREAM(get_logger(), stream_arg)
 #define DEBUG_STREAM_THROTTLE_STR(duration, stream_arg) \
-  if (_debugStreaming) { \
+  if (mDebugStreaming) { \
     rclcpp::Clock steady_clock(RCL_STEADY_TIME); \
     RCLCPP_DEBUG_STREAM_THROTTLE( \
       get_logger(), steady_clock, duration, \

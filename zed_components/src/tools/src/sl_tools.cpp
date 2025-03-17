@@ -1,4 +1,4 @@
-// Copyright 2024 Stereolabs
+// Copyright 2022 Stereolabs
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,8 +16,6 @@
 #include <sys/stat.h>
 #include <unistd.h> // getuid
 
-#include <algorithm>
-#include <string>
 #include <sstream>
 #include <vector>
 
@@ -514,51 +512,6 @@ bool checkRoot()
   }
 }
 
-bool ReadCocoYaml(
-  const std::string & label_file, std::unordered_map<std::string,
-  std::string> & out_labels)
-{
-  // Open the YAML file
-  std::ifstream file(label_file.c_str());
-  if (!file.is_open()) {
-    return false;
-  }
-
-  // Read the file line by line
-  std::string line;
-  std::vector<std::string> lines;
-  while (std::getline(file, line)) {
-    lines.push_back(line);
-  }
-
-  // Find the start and end of the names section
-  std::size_t start = 0;
-  std::size_t end = 0;
-  for (std::size_t i = 0; i < lines.size(); i++) {
-    if (lines[i].find("names:") != std::string::npos) {
-      start = i + 1;
-    } else if (start > 0 && lines[i].find(':') == std::string::npos) {
-      end = i;
-      break;
-    }
-  }
-
-  // Extract the labels
-  for (std::size_t i = start; i < end; i++) {
-    std::stringstream ss(lines[i]);
-    std::string class_id, label;
-    std::getline(ss, class_id, ':'); // Extract the number before the delimiter
-    // ---> remove heading spaces and tabs
-    class_id.erase(remove(class_id.begin(), class_id.end(), ' '), class_id.end());
-    class_id.erase(remove(class_id.begin(), class_id.end(), '\t'), class_id.end());
-    // <--- remove heading spaces and tabs
-    std::getline(ss, label); // Extract the string after the delimiter
-    out_labels[class_id] = label;
-  }
-
-  return true;
-}
-
 
 bool isZED(sl::MODEL camModel)
 {
@@ -607,21 +560,6 @@ bool isObjDetAvailable(sl::MODEL camModel)
     return true;
   }
   return false;
-}
-
-std::string seconds2str(double sec)
-{
-  int days = sec / 86400;
-  sec -= days * 86400;
-  int hours = sec / 3600;
-  sec -= hours * 3600;
-  int minutes = sec / 60;
-  sec -= minutes * 60;
-
-  std::stringstream ss;
-  ss << days << " days, " << hours << " hours, " << minutes << " min, " << sec << " sec";
-
-  return ss.str();
 }
 
 StopWatch::StopWatch(rclcpp::Clock::SharedPtr clock)
